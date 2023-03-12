@@ -6,7 +6,7 @@ module.exports = new class adminEpisodeController extends controller {
             if(err) throw err;
 
             if(episodes) {
-                res.json({
+                return res.json({
                     data : episodes,
                     success : true
                 });
@@ -15,7 +15,10 @@ module.exports = new class adminEpisodeController extends controller {
     }
 
     single(req, res) {
+        req.checkParams('id' , 'ای دی وارد شده صحیح نیست').isMongoId();
 
+        if(this.showValidationErrors(req , res))
+                return;
 
         this.model.Episode.findById(req.params.id , (err , episode) => {
             if(episode) {
@@ -34,8 +37,16 @@ module.exports = new class adminEpisodeController extends controller {
 
     store(req , res) {
         //validation
-    
+        req.checkBody('title' , 'عنوان نمیتواند خالی بماند').notEmpty();
+        req.checkBody('body' , 'متن نمیتواند خالی بماند').notEmpty();
+        req.checkBody('course_id' , 'آیدی دوره نمیتواند خالی بماند').notEmpty();
+        req.checkBody('videoUrl' , 'آدرس ویدیو نمیتواند خالی بماند').notEmpty();
+        req.checkBody('number' , 'شماره ویدیو نمیتواند خالی بماند').notEmpty();
         
+        this.escapeAndTrim(req , 'title body course_id videoUrl number');
+
+            if(this.showValidationErrors(req , res))
+                return;
 
         let course = this.model.Course.findById(req.body.course_id , (err , course) => {
             
@@ -64,7 +75,10 @@ module.exports = new class adminEpisodeController extends controller {
 
 
     update(req ,res) {
+        req.checkParams('id' , 'ای دی وارد شده صحیح نیست').isMongoId();
 
+        if(this.showValidationErrors(req , res))
+                return;
 
         this.model.Episode.findByIdAndUpdate(req.params.id , { 
             title : 'episode 11'
@@ -85,15 +99,18 @@ module.exports = new class adminEpisodeController extends controller {
     }
 
     destroy(req ,res) {
+        req.checkParams('id' , 'ای دی وارد شده صحیح نیست').isMongoId();
 
+        if(this.showValidationErrors(req , res))
+                return;
 
         this.model.Episode.findById(req.params.id).populate('course').exec((err , episode) => {
             if(err) throw err;
             
             if(episode) {
                 let course = episode.course;
-                let pos = course.episodes.indexOf(episode._id);
-                course.episodes.splice(pos , 1);
+                let position = course.episodes.indexOf(episode._id);
+                course.episodes.splice(position , 1);
                 course.save(err => {
                     if(err) throw err;
 
