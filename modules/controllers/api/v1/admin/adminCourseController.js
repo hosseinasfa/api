@@ -1,4 +1,5 @@
 const controller = require('modules/controllers/api/controller');
+const { check } = require('express-validator');
 
 
 module.exports = new class adminCourseController extends controller {
@@ -22,25 +23,36 @@ module.exports = new class adminCourseController extends controller {
 
     store(req , res) {
             //Validation 
-            req.checkBody('title' , 'عنوان نمیتواند خالی بماند').notEmpty();
-            req.checkBody('body' , 'متن نمیتواند خالی بماند').notEmpty();
-            req.checkBody('price' , 'قیمت نمیتواند خالی بماند').notEmpty();
-            req.checkBody('image' , 'عنوان نمیتواند خالی بماند').notEmpty();
+            // req.checkBody('title' , 'عنوان نمیتواند خالی بماند').notEmpty();
+            // req.checkBody('body' , 'متن نمیتواند خالی بماند').notEmpty();
+            // req.checkBody('price' , 'قیمت نمیتواند خالی بماند').notEmpty();
+            // req.checkBody('image' , 'عنوان نمیتواند خالی بماند').notEmpty();
 
-            this.escapeAndTrim(req , 'title price image');
+            // this.escapeAndTrim(req , 'title price image');
 
-            if(this.showValidationErrors(req , res))
-                return;
+            // if(this.showValidationErrors(req , res))
+            //     return;
             
+            [
+                check('title')
+                    .not()
+                    .isEmpty()
+                    .withMessage('عنوان نمیتواند خالی بماند'),
+                ]
        
     
         let newCourse = new this.model.Course({
+            user : req.user._id,
             title : req.body.title,
             body : req.body.body,
             price : req.body.price,
             image : req.body.image
-        }).save(err => {
+        });
+        
+        newCourse.save(err => {
             if(err) throw err;
+            req.user.courses.push(newCourse._id);
+            req.user.save();
             res.json('create course')
         })
     }

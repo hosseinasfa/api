@@ -1,4 +1,5 @@
-const controller = require('modules/controllers/api/controller')
+const controller = require('modules/controllers/api/controller');
+const { check } = require('express-validator');
 
 module.exports = new class adminEpisodeController extends controller {
     index(req , res) {
@@ -37,16 +38,22 @@ module.exports = new class adminEpisodeController extends controller {
 
     store(req , res) {
         //validation
-        req.checkBody('title' , 'عنوان نمیتواند خالی بماند').notEmpty();
-        req.checkBody('body' , 'متن نمیتواند خالی بماند').notEmpty();
-        req.checkBody('course_id' , 'آیدی دوره نمیتواند خالی بماند').notEmpty();
-        req.checkBody('videoUrl' , 'آدرس ویدیو نمیتواند خالی بماند').notEmpty();
-        req.checkBody('number' , 'شماره ویدیو نمیتواند خالی بماند').notEmpty();
+        // req.checkBody('title' , 'عنوان نمیتواند خالی بماند').notEmpty();
+        // req.checkBody('body' , 'متن نمیتواند خالی بماند').notEmpty();
+        // req.checkBody('course_id' , 'آیدی دوره نمیتواند خالی بماند').notEmpty();
+        // req.checkBody('videoUrl' , 'آدرس ویدیو نمیتواند خالی بماند').notEmpty();
+        // req.checkBody('number' , 'شماره ویدیو نمیتواند خالی بماند').notEmpty();
+        [
+        check('title')
+            .not()
+            .isEmpty()
+            .withMessage('عنوان نمیتواند خالی بماند'),
+        ]
         
-        this.escapeAndTrim(req , 'title body course_id videoUrl number');
+        // this.escapeAndTrim(req , 'title body course_id videoUrl number');
 
-            if(this.showValidationErrors(req , res))
-                return;
+            // if(this.showValidationErrors(req , res))
+            //     return;
 
         let course = this.model.Course.findById(req.body.course_id , (err , course) => {
             

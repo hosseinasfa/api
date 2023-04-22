@@ -5,6 +5,7 @@ const router = express.Router();
 //Controllers
 const homeController = require('modules/controllers/api/v1/homeController');
 const courseController = require('modules/controllers/api/v1/courseController');
+const episodeController = require('modules/controllers/api/v1/episodeController');
 const authController = require('modules/controllers/api/v1/authController');
 const userController = require('modules/controllers/api/v1/userController');
 
@@ -23,11 +24,13 @@ const adminEpisodeController = require('modules/controllers/api/v1/admin/adminEp
 
 //Web Routes
 router.get('/' , homeController.index);
-router.get('/courses' , courseController.index);
 router.get('/version' , homeController.version);
 router.post('/login' , loginValidator.handle() , authController.login);
 router.post('/register' , registerValidator.handle() , authController.register);
-router.get('/user' , apiAuth , userController.index)
+router.get('/user' , apiAuth , userController.index);
+
+router.get('/courses' , courseController.index);
+router.get('/episodes/:id' , episodeController.single);
 
 //Admin Routes
 const adminRouter = express.Router();
@@ -44,7 +47,7 @@ adminRouter.post('/episodes' , adminEpisodeController.store);
 adminRouter.put('/episodes/:id' , adminEpisodeController.update);
 adminRouter.delete('/episodes/:id' , adminEpisodeController.destroy)
 
-router.use('/admin' , adminRouter);
+router.use('/admin', apiAuth , adminRouter);
 
 
 

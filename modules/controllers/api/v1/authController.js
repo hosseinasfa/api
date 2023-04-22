@@ -60,6 +60,8 @@ module.exports = new class authController extends controller {
                             success : false,
                             data : 'پسورد وارد شده صحیح نمی باشد'
                         })
+
+                        //create api token in usertransform
                     
                     return res.json({
                         data : new userTransform().transform(user , true),
